@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerador Pós-Apocalíptico com IA</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+    h1 { font-size: 2rem; }
+    .container { max-width: 800px; margin: auto; text-align: center; }
+    img { max-width: 100%; margin: 20px 0; border-radius: 8px; }
+    button, label { padding: 10px 20px; font-size: 1rem; cursor: pointer; border-radius: 5px; }
+    label { background-color: #4CAF50; color: white; }
+    button { background-color: #007bff; color: white; border: none; }
+    .disabled { background-color: #aaa; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Gerador de Imagem Pós-Apocalíptica</h1>
+
+  <input type="file" id="imageInput" accept="image/*" style="display: none;">
+  <label for="imageInput">Escolher Imagem do Espaço</label>
+
+  <div id="preview"></div>
+
+  <button id="generateBtn" class="disabled" disabled>Gerar imagem com IA</button>
+
+  <div id="result"></div>
+</div>
+
+<script>
+  let imageFile = null;
+
+  document.getElementById('imageInput').addEventListener('change', (event) => {
+    imageFile = event.target.files[0];
+    const preview = document.getElementById('preview');
+    preview.innerHTML = `<img src="${URL.createObjectURL(imageFile)}" alt="Preview">`;
+    document.getElementById('generateBtn').disabled = false;
+    document.getElementById('generateBtn').classList.remove('disabled');
+  });
+
+  document.getElementById('generateBtn').addEventListener('click', async () => {
+    if (!imageFile) return;
+
+    const formData = new FormData();
+    formData.append('image', imageFile);
+
+    const btn = document.getElementById('generateBtn');
+    btn.disabled = true;
+    btn.textContent = 'Gerando...';
+
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await response.json();
+      document.getElementById('result').innerHTML = `<h2>Resultado:</h2><img src="${data.image_url}" alt="Gerado">`;
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao gerar imagem.');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Gerar imagem com IA';
+  });
+</script>
+
+</body>
+</html>
